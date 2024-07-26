@@ -1,0 +1,26 @@
+cachorro:
+sexo
+raça
+porte
+idade
+cor da pelagem
+altura da pelagem
+castrado
+temperamento
+
+gato:
+sexo
+raça
+idade
+cor da pelagem
+altura da pelagem
+castrado
+temperamento
+
+
+extras:
+tem familia?
+tem doenças?
+tem necessidades especiais?
+educado (caixinha, latidos)
+se da bem com outros animais?

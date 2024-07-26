@@ -1,0 +1,71 @@
+@keyframes pet_in {
+  0% {
+    left: -100vw;
+  }
+  90% {
+    left: 18px;
+  }
+  100% {
+    left: 16px;
+  }
+}
+
+@keyframes person_in {
+  0% {
+    right: -100vw;
+  }
+  90% {
+    right: 18px;
+  }
+  100% {
+    right: 16px;
+  }
+}
+
+.image_mosaic {
+  position: relative;
+  overflow: visible;
+  height: 200px;
+  width: 200px;
+}
+
+.image_mosaic .image_circle:first-of-type {
+  width: 140px;
+  position: absolute;
+  top: 18px;
+  left: 16px;
+  animation-name: pet_in;
+  animation-duration: 3s;
+  animation-delay: 1s;
+  animation-timing-function: ease-out;
+}
+
+.image_mosaic .image_circle:nth-of-type(2) {
+  width: 100px;
+  position: absolute;
+  bottom: 18px;
+  right: 16px;
+  animation-name: person_in;
+  animation-duration: 3s;
+  animation-delay: 1s;
+  animation-timing-function: ease-out;
+}
+
+.image_circle {
+  overflow: hidden;
+  border-radius: 50%;
+  border: 8px solid var(--color-primary);
+  aspect-ratio: 1;
+}
+
+.image_circle img {
+  object-fit: cover;
+}
+
+.custom_container {
+  height: 100dvh;
+  display: flex;
+  place-content: center;
+  padding-inline: 2rem;
+  overflow: hidden;
+}
