@@ -12,6 +12,8 @@ module.exports = {
     extend: {
       colors: {
         softgreen: "#7abd7c",
+        lightgray_: "#7b7b7b",
+        lightergray_: "#b1b5b1",
       },
     },
   },
