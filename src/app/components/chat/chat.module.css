@@ -1,0 +1,41 @@
+.header {
+  max-height: var(--dimen-header-height);
+}
+
+.message-body {
+  position: relative;
+}
+
+.message-body::before {
+  content: "";
+  display: block;
+  width: 20px;
+  height: 20px;
+  position: absolute;
+}
+
+.message-main {
+  background-color: var(--color-primary);
+}
+
+.message-main::before {
+  left: -20px;
+  background-color: var(--color-primary);
+  clip-path: polygon(0% 0%, 100% 0%, 100% 100%);
+  border-top-left-radius: 10px;
+}
+
+.message-reply {
+  background-color: var(--color-lighter-gray);
+}
+
+.message-reply::before {
+  right: -20px;
+  background-color: var(--color-lighter-gray);
+  clip-path: polygon(0% 0%, 0% 100%, 100% 0%);
+  border-top-right-radius: 10px;
+}
+
+.chat-box {
+  min-height: calc(100dvh - var(--dimen-header-height));
+}

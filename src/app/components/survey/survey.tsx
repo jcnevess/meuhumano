@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import styles from "./survey.module.css";
-import { Sigmar } from "next/font/google";
+import { useState } from "react";
+import { Sigmar_One } from "next/font/google";
 
-const sigmar = Sigmar({ weight: "400", subsets: ["latin"] });
+const sigmarone = Sigmar_One({ weight: "400", subsets: ["latin"] });
 
 export default function Survey() {
   const steps = [
@@ -100,7 +100,7 @@ export default function Survey() {
 
   return (
     <div className={styles.container}>
-      <h1 className={[sigmar.className, styles.title].join(" ")}>
+      <h1 className={[sigmarone.className, styles.title].join(" ")}>
         meu
         <br />
         humano

@@ -1,5 +1,4 @@
 .container {
-  margin-inline: 2rem;
   display: flex;
   flex-direction: column;
   height: 100dvh;
@@ -12,7 +11,7 @@
   color: var(--color-primary);
   -webkit-text-stroke: 2px black;
   letter-spacing: 0.15em;
-  font-size: 2.75rem;
+  font-size: clamp(2.5rem, 12.5vw, 3.5rem);
   line-height: 1.15em;
 }
 
@@ -26,18 +25,19 @@
 .image_mosaic {
   position: relative;
   overflow: hidden;
-  height: 200px;
+  width: 320px;
+  height: 280px;
 }
 
 .image_mosaic .image_circle:first-of-type {
-  width: 140px;
+  width: 200px;
   position: absolute;
   top: 18px;
   left: 38px;
 }
 
 .image_mosaic .image_circle:nth-of-type(2) {
-  width: 100px;
+  width: 160px;
   position: absolute;
   bottom: 18px;
   right: 38px;
@@ -57,6 +57,7 @@
 .action_button {
   background-color: var(--color-primary);
   text-transform: capitalize;
+  text-align: center;
   border-radius: 5px;
   border: none;
   letter-spacing: 0.1rem;
@@ -79,6 +80,6 @@
 
 .attribution {
   font-size: 0.9rem;
-  letter-spacing: 0.2em;  
+  letter-spacing: 0.2em;
   text-align: center;
 }
