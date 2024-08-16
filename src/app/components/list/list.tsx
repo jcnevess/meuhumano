@@ -1,28 +1,9 @@
 "use client";
 
+import { PetFilter, Pet } from "@/app/models/models";
+import filterDatabase from "@/app/utils/utils";
 import { ArrowLeft, Filter, X } from "lucide-react";
 import { RefObject, useEffect, useRef, useState } from "react";
-
-interface PetFilter {
-  key: string;
-  value: string;
-}
-
-interface Pet {
-  name: string;
-  shelter: string;
-  distance: number;
-  description: string;
-  gender: string;
-  breed: string;
-  size: string;
-  age: number;
-  fur: string;
-  castrated: boolean;
-  mood: string;
-  coverIndex: number; // Zero-based index of cover image on mediaList
-  mediaList: { mimetype: string; uri: string; alt: string }[];
-}
 
 // Custom hook to handle clicks outside search box
 function useClickOutside(
@@ -45,42 +26,7 @@ function useClickOutside(
 }
 
 export default function List() {
-  const filters: PetFilter[] = [
-    { key: "gender", value: "fêmea" },
-    { key: "gender", value: "macho" },
-    { key: "breed", value: "SRD" },
-    { key: "breed", value: "ragdoll" },
-    { key: "breed", value: "siamês" },
-    { key: "breed", value: "persa" },
-    { key: "breed", value: "siberiano" },
-    { key: "breed", value: "british shorthair" },
-    { key: "breed", value: "birmanês" },
-    { key: "breed", value: "bulldog" },
-    { key: "breed", value: "labrador" },
-    { key: "breed", value: "golden retriever" },
-    { key: "breed", value: "poodle" },
-    { key: "breed", value: "rottweiler" },
-    { key: "breed", value: "beagle" },
-    { key: "breed", value: "yorkshire" },
-    { key: "breed", value: "border collie" },
-    { key: "breed", value: "dachshund" },
-    { key: "breed", value: "pastor alemão" },
-    { key: "breed", value: "outra raça" },
-    { key: "size", value: "porte pequeno" },
-    { key: "size", value: "porte médio" },
-    { key: "size", value: "porte grande" },
-    { key: "fur", value: "pelo baixo" },
-    { key: "fur", value: "pelo médio" },
-    { key: "fur", value: "pelo alto" },
-    { key: "age", value: "menos de 1 ano" },
-    { key: "age", value: "entre 1 e 3 anos" },
-    { key: "age", value: "entre 3 e 7 anos" },
-    { key: "age", value: "mais de 7 anos" },
-    { key: "castrated", value: "castrado" },
-    { key: "castrated", value: "não-castrado" },
-    { key: "mood", value: "agitado" },
-    { key: "mood", value: "calmo" },
-  ];
+  const filters = filterDatabase;
 
   const [filterResults, setFilterResults] = useState<PetFilter[]>([]);
 
