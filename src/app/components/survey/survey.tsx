@@ -4,7 +4,11 @@ import styles from "./survey.module.css";
 import { useState } from "react";
 import { Sigmar_One } from "next/font/google";
 import { PetFilter } from "@/app/models/models";
-import filterDatabase from "@/app/utils/utils";
+import filterDatabase from "@/app/lib/utils";
+import { filterAdded } from "@/app/lib/features/filterSlice";
+import { useAppDispatch, useAppStore } from "@/app/lib/hooks";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const sigmarone = Sigmar_One({ weight: "400", subsets: ["latin"] });
 
@@ -21,107 +25,113 @@ const steps = [
 export default function Survey() {
   const [currentStep, setCurrentStep] = useState(0);
 
-  const [formData, setFormData] = useState<{
-    [step: string]: PetFilter | null;
-  }>({
-    animal: null,
-    gender: null,
-    size: null,
-    age_range: null,
-    fur_height: null,
-    castrated: null,
-    mood: null,
-  });
+  const dispatch = useAppDispatch();
+  const store = useAppStore();
+
+  const router = useRouter();
+
+  const [appliedFilters, setAppliedFilters] = useState<PetFilter[]>([]);
 
   function handleNextStep() {
     setCurrentStep((prevStep) => prevStep + 1);
   }
 
-  function handlePreviousStep() {
-    setCurrentStep((prevStep) => prevStep - 1);
+  function handleSubmit() {
+    router.push("/list");
   }
 
   function handleAnimalSelection(event: React.MouseEvent<HTMLInputElement>) {
-    setFormData({
-      ...formData,
-      animal: {
+    dispatch(
+      filterAdded({
         key: "animal",
         value: (event.target as HTMLInputElement).value,
-      },
-    });
+      })
+    );
 
     handleNextStep();
   }
 
   function handleGenderSelection(event: React.MouseEvent<HTMLInputElement>) {
-    setFormData({
-      ...formData,
-      gender: {
+    dispatch(
+      filterAdded({
         key: "gender",
         value: (event.target as HTMLInputElement).value,
-      },
-    });
+      })
+    );
 
     handleNextStep();
   }
 
   function handleSizeSelection(event: React.MouseEvent<HTMLInputElement>) {
-    setFormData({
-      ...formData,
-      size: {
+    dispatch(
+      filterAdded({
         key: "size",
         value: (event.target as HTMLInputElement).value,
-      },
-    });
+      })
+    );
 
     handleNextStep();
   }
 
   function handleAgeSelection(event: React.MouseEvent<HTMLInputElement>) {
-    setFormData({
-      ...formData,
-      age_range: {
+    dispatch(
+      filterAdded({
         key: "age_range",
         value: (event.target as HTMLInputElement).value,
-      },
-    });
+      })
+    );
 
     handleNextStep();
   }
 
   function handleFurHeightSelection(event: React.MouseEvent<HTMLInputElement>) {
-    setFormData({
-      ...formData,
-      fur_height: {
+    dispatch(
+      filterAdded({
         key: "fur_height",
         value: (event.target as HTMLInputElement).value,
-      },
-    });
+      })
+    );
 
     handleNextStep();
   }
 
   function handleCastratedSelection(event: React.MouseEvent<HTMLInputElement>) {
-    setFormData({
-      ...formData,
-      castrated: {
+    dispatch(
+      filterAdded({
         key: "castrated",
         value: (event.target as HTMLInputElement).value,
-      },
-    });
+      })
+    );
 
     handleNextStep();
   }
 
   function handleMoodSelection(event: React.MouseEvent<HTMLInputElement>) {
-    setFormData({
-      ...formData,
-      mood: {
+    dispatch(
+      filterAdded({
         key: "mood",
         value: (event.target as HTMLInputElement).value,
-      },
-    });
+      })
+    );
+
+    handleSubmit();
   }
+
+  function isFilterApplied(key: string, value: string) {
+    return (
+      appliedFilters.filter(
+        (applFlt) => applFlt.key === key && applFlt.value === value
+      ).length > 0
+    );
+  }
+
+  function prepareString(input: string) {
+    return input.replaceAll("_", " ");
+  }
+
+  store.subscribe(() => {
+    setAppliedFilters(store.getState().filters.applied);
+  });
 
   return (
     <div className={styles.container}>
@@ -141,8 +151,7 @@ export default function Survey() {
                 className={`
                 ${styles.survey_option} 
                 ${
-                  formData.animal?.key === "animal" &&
-                  formData.animal.value === flt.value
+                  isFilterApplied("animal", flt.value)
                     ? styles.option_checked
                     : ""
                 }
@@ -154,12 +163,9 @@ export default function Survey() {
                   name="animal"
                   value={flt.value}
                   onClick={handleAnimalSelection}
-                  defaultChecked={
-                    formData.animal?.key === "animal" &&
-                    formData.animal.value === flt.value
-                  }
+                  defaultChecked={isFilterApplied("animal", flt.value)}
                 />
-                {flt.value}
+                {prepareString(flt.value)}
               </label>
             ))}
         </div>
@@ -174,8 +180,7 @@ export default function Survey() {
               <label
                 key={flt.value}
                 className={`${styles.survey_option} ${
-                  formData.gender?.key === "gender" &&
-                  formData.gender.value === flt.value
+                  isFilterApplied("gender", flt.value)
                     ? styles.option_checked
                     : ""
                 }`}
@@ -186,12 +191,9 @@ export default function Survey() {
                   name="gender"
                   value={flt.value}
                   onClick={handleGenderSelection}
-                  defaultChecked={
-                    formData.gender?.key === "gender" &&
-                    formData.gender.value === flt.value
-                  }
+                  defaultChecked={isFilterApplied("gender", flt.value)}
                 />
-                {flt.value}
+                {prepareString(flt.value)}
               </label>
             ))}
         </div>
@@ -206,8 +208,7 @@ export default function Survey() {
               <label
                 key={flt.value.replaceAll(" ", "_")}
                 className={`${styles.survey_option} ${
-                  formData.size?.key === "size" &&
-                  formData.size.value === flt.value
+                  isFilterApplied("size", flt.value)
                     ? styles.option_checked
                     : ""
                 }`}
@@ -218,12 +219,9 @@ export default function Survey() {
                   name="size"
                   value={flt.value.replaceAll(" ", "_")}
                   onClick={handleSizeSelection}
-                  defaultChecked={
-                    formData.size?.key === "size" &&
-                    formData.size.value === flt.value
-                  }
+                  defaultChecked={isFilterApplied("size", flt.value)}
                 />
-                {flt.value}
+                {prepareString(flt.value)}
               </label>
             ))}
         </div>
@@ -238,9 +236,10 @@ export default function Survey() {
               <label
                 key={flt.value.replaceAll(" ", "_")}
                 className={`${styles.survey_option} ${
-                  formData.animal?.key === "age_range" &&
-                  formData.animal.value === flt.value
-                } ? styles.option_checked : ""
+                  isFilterApplied("age_range", flt.value)
+                    ? styles.option_checked
+                    : ""
+                }
               }`}
               >
                 <input
@@ -249,12 +248,9 @@ export default function Survey() {
                   name="age_range"
                   value={flt.value.replaceAll(" ", "_")}
                   onClick={handleAgeSelection}
-                  defaultChecked={
-                    formData.animal?.key === "age_range" &&
-                    formData.animal.value === flt.value
-                  }
+                  defaultChecked={isFilterApplied("age_range", flt.value)}
                 />
-                {flt.value}
+                {prepareString(flt.value)}
               </label>
             ))}
         </div>
@@ -269,9 +265,10 @@ export default function Survey() {
               <label
                 key={flt.value.replaceAll(" ", "_")}
                 className={`${styles.survey_option} ${
-                  formData.fur_height?.key === "fur_height" &&
-                  formData.fur_height.value === flt.value
-                } ? styles.option_checked : ""
+                  isFilterApplied("fur_height", flt.value)
+                    ? styles.option_checked
+                    : ""
+                }
               }`}
               >
                 <input
@@ -280,12 +277,9 @@ export default function Survey() {
                   name="fur"
                   value={flt.value.replaceAll(" ", "_")}
                   onClick={handleFurHeightSelection}
-                  defaultChecked={
-                    formData.fur_height?.key === "fur_height" &&
-                    formData.fur_height.value === "short"
-                  }
+                  defaultChecked={isFilterApplied("fur_height", flt.value)}
                 />
-                {flt.value}
+                {prepareString(flt.value)}
               </label>
             ))}
         </div>
@@ -300,9 +294,10 @@ export default function Survey() {
               <label
                 key={flt.value}
                 className={`${styles.survey_option} ${
-                  formData.castrated?.key === "castrated" &&
-                  formData.castrated.value === flt.value
-                } ? styles.option_checked : ""
+                  isFilterApplied("castrated", flt.value)
+                    ? styles.option_checked
+                    : ""
+                }
             }`}
               >
                 <input
@@ -311,12 +306,9 @@ export default function Survey() {
                   name="castrated"
                   value={flt.value}
                   onClick={handleCastratedSelection}
-                  defaultChecked={
-                    formData.castrated?.key === "castrated" &&
-                    formData.castrated.value === flt.value
-                  }
+                  defaultChecked={isFilterApplied("castrated", flt.value)}
                 />
-                {flt.value}
+                {prepareString(flt.value)}
               </label>
             ))}
         </div>
@@ -331,9 +323,10 @@ export default function Survey() {
               <label
                 key={flt.value}
                 className={`${styles.survey_option} ${
-                  formData.mood?.key === "mood" &&
-                  formData.mood.value === flt.value
-                } ? styles.option_checked : ""
+                  isFilterApplied("mood", flt.value)
+                    ? styles.option_checked
+                    : ""
+                }
           }`}
               >
                 <input
@@ -342,26 +335,18 @@ export default function Survey() {
                   name="mood"
                   value={flt.value}
                   onClick={handleMoodSelection}
-                  defaultChecked={
-                    formData.mood?.key === "mood" &&
-                    formData.mood.value === flt.value
-                  }
+                  defaultChecked={isFilterApplied("mood", flt.value)}
                 />
-                {flt.value}
+                {prepareString(flt.value)}
               </label>
             ))}
         </div>
       )}
 
       <div className={styles.survey_controls}>
-        <button
-          className={styles.survey_button}
-          disabled={currentStep === 0}
-          onClick={handlePreviousStep}
-        >
-          Voltar
-        </button>
-        <button className={styles.survey_button}>Ver Lista</button>
+        <Link href="/list" className={styles.survey_button}>
+          Ver Lista
+        </Link>
       </div>
     </div>
   );

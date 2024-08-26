@@ -1,7 +1,7 @@
 "use client";
 
 import { PetFilter, Pet } from "@/app/models/models";
-import filterDatabase from "@/app/utils/utils";
+import filterDatabase from "@/app/lib/utils";
 import { ArrowLeft, Filter, X } from "lucide-react";
 import { RefObject, useEffect, useRef, useState } from "react";
 

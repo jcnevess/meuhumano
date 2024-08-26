@@ -42,8 +42,7 @@
 }
 
 .survey_controls {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
   gap: 1rem;
   margin: 2rem 0;
 }
@@ -54,6 +53,8 @@
   background-color: white;
   padding-block: 0.5rem;
   letter-spacing: 0.1em;
+  flex-grow: 1;
+  text-align: center;
 }
 
 .container {
