@@ -10,78 +10,56 @@ import {
   Ellipsis,
   MessageSquare,
 } from "lucide-react";
+import { Pet } from "@/app/models/models";
+import { ProfileService } from "./profile.service";
+import { useRouter } from "next/navigation";
 
-export default function Profile() {
-  const animal = {
-    name: "Flanela",
-    shelter: "Abrigo Patinhas",
-    distance: 10,
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do \
-          eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad \
-          minim veniam, quis nostrud exercitation. Lorem ipsum dolor sit amet, \
-          consectetur adipiscing elit, sed do eiusmod tempor incididunt ut \
-          labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud \
-          exercitation.",
-    gender: "fêmea",
-    breed: "SRD",
-    size: "médio",
-    age: 5,
-    fur: "médio",
-    castrated: true,
-    mood: "agitado",
-    mediaList: [
-      {
-        mimetype: "video/mp4",
-        uri: "./files/video/dogineo.mp4",
-        alt: "Flanela",
-        isCover: false,
-      },
-      {
-        mimetype: "image/jpeg",
-        uri: "./files/img/pexels-dog.jpg",
-        alt: "Flanela",
-        isCover: true,
-      },
-      {
-        mimetype: "image/jpeg",
-        uri: "./files/img/pexels-dog2.jpg",
-        alt: "Flanela",
-        isCover: false,
-      },
-    ],
-  };
+type ProfileProps = { id: string };
 
+export default function Profile(props: ProfileProps) {
+  const [animal, setAnimal] = useState<Pet>();
   const [mediaIndex, setMediaIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
 
   const videoPlayerRef = useRef<HTMLVideoElement>(null);
 
+  const router = useRouter();
+
+  useEffect(() => {
+    const profileService = ProfileService.getInstance();
+
+    profileService.getPet(props.id).then((pet) => setAnimal(pet));
+  }, [props.id]);
+
   function navigateTo(index: number) {
     setMediaIndex(index);
+    setIsPlaying(false);
   }
 
   function navigatePrevious() {
     if (mediaIndex > 0) {
       setMediaIndex((prev) => prev - 1);
     }
+    setIsPlaying(false);
   }
 
   function navigateNext() {
-    if (mediaIndex < animal.mediaList.length - 1) {
+    if (animal && mediaIndex < animal.mediaList.length - 1) {
       setMediaIndex((prev) => prev + 1);
     }
+    setIsPlaying(false);
   }
 
   function togglePlay() {
     const video = videoPlayerRef.current;
-    if (video?.paused || video?.ended) {
-      video.play();
-      setIsPlaying(true);
-    } else {
+
+    if (isPlaying) {
       video?.pause();
       setIsPlaying(false);
+    } else {
+      video?.play();
+      setIsPlaying(true);
     }
   }
 
@@ -89,11 +67,15 @@ export default function Profile() {
     setShowOptions((prev) => !prev);
   }
 
+  function navigateToMessage(id: string) {
+    router.push(`/chat?id=${id}`);
+  }
+
   return (
     <div>
       <div className="media-gallery relative bg-lightergray_">
         <div className="media-overlays">
-          {animal.mediaList[mediaIndex].mimetype === "video/mp4" && (
+          {animal?.mediaList[mediaIndex].mimetype === "video/mp4" && (
             <div
               id="play_control"
               className={`control-play absolute flex place-content-center place-items-center 
@@ -107,6 +89,7 @@ export default function Profile() {
                 height={96}
                 strokeWidth={1}
                 stroke="white"
+                className="drop-shadow-[0_0_2px_black]"
               />
             </div>
           )}
@@ -116,21 +99,31 @@ export default function Profile() {
               className="control-previous absolute top-1/2 -translate-y-1/2 z-50"
               onClick={navigatePrevious}
             >
-              <ChevronLeft stroke="white" />
+              <ChevronLeft
+                stroke="white"
+                className="drop-shadow-[0_0_2px_black]"
+              />
             </div>
           )}
 
-          {mediaIndex < animal.mediaList.length - 1 && (
+          {animal && mediaIndex < animal.mediaList.length - 1 && (
             <div
               className="control-next absolute top-1/2 right-0 -translate-y-1/2 z-50"
               onClick={navigateNext}
             >
-              <ChevronRight stroke="white" />
+              <ChevronRight
+                stroke="white"
+                className="drop-shadow-[0_0_2px_black]"
+              />
             </div>
           )}
 
           <div className="control-options absolute top-[5%] right-[5%] z-50">
-            <Ellipsis stroke="white" onClick={toggleOptions} />
+            <Ellipsis
+              stroke="white"
+              onClick={toggleOptions}
+              className="drop-shadow-[0_0_2px_black]"
+            />
             {showOptions && (
               <div
                 className={`${styles.options} bg-white absolute right-[6px] top-[28px] 
@@ -145,9 +138,9 @@ export default function Profile() {
             )}
           </div>
 
-          {animal.mediaList.length > 1 && (
+          {animal && animal.mediaList.length > 1 && (
             <div className="control-media-counter absolute flex bottom-0 left-1/2 -translate-x-1/2 z-50">
-              {animal.mediaList.map((_, index) => (
+              {animal?.mediaList.map((_, index) => (
                 <div
                   key={index}
                   className={`control-media-dot ${
@@ -159,6 +152,7 @@ export default function Profile() {
                     stroke={
                       index === mediaIndex ? "var(--color-primary)" : "white"
                     }
+                    className="drop-shadow-[0_0_2px_black]"
                   />
                 </div>
               ))}
@@ -167,7 +161,7 @@ export default function Profile() {
         </div>
 
         <div className="media-contents flex items-center overflow-hidden h-[45dvh]">
-          {animal.mediaList[mediaIndex].mimetype === "video/mp4" ? (
+          {animal?.mediaList[mediaIndex].mimetype === "video/mp4" ? (
             <div className="media-content">
               <video
                 id="videoplayer"
@@ -176,12 +170,12 @@ export default function Profile() {
                 disablePictureInPicture
                 loop
                 preload="metadata"
-                aria-label={animal.mediaList[mediaIndex].alt}
+                aria-label={animal?.mediaList[mediaIndex].alt}
                 data-status="paused"
               >
                 <source
-                  src={animal.mediaList[mediaIndex].uri}
-                  type={animal.mediaList[mediaIndex].mimetype}
+                  src={animal?.mediaList[mediaIndex].uri}
+                  type={animal?.mediaList[mediaIndex].mimetype}
                 />
               </video>
             </div>
@@ -189,8 +183,8 @@ export default function Profile() {
             <div className="media-content">
               <picture>
                 <img
-                  src={animal.mediaList[mediaIndex].uri}
-                  alt={animal.mediaList[mediaIndex].alt}
+                  src={animal?.mediaList[mediaIndex].uri}
+                  alt={animal?.mediaList[mediaIndex].alt}
                 />
               </picture>
             </div>
@@ -202,11 +196,11 @@ export default function Profile() {
         <div className="profile-heading flex justify-between">
           <div className="heading-info">
             <h1 className="profile-name text-black text-4xl font-bold">
-              {animal.name}
+              {animal?.name}
             </h1>
-            <h2 className="profile-shelter font-bold">de {animal.shelter}</h2>
+            <h2 className="profile-shelter font-bold">de {animal?.shelter}</h2>
             <div className="profile-distance">
-              {animal.distance} km de distância
+              {animal?.distance} km de distância
             </div>
           </div>
           <div className="profile-message-icon pt-1">
@@ -214,6 +208,7 @@ export default function Profile() {
               fill="var(--color-primary)"
               stroke="var(--color-primary)"
               size={36}
+              onClick={() => navigateToMessage(animal?.id ?? "")}
             />
           </div>
         </div>
@@ -221,26 +216,29 @@ export default function Profile() {
           className="profile-tags *:inline-block  *:text-black *:bg-lightergray_ *:rounded-xl *:px-3 *:text-[0.9rem]
         flex flex-wrap place-content-center gap-2"
         >
-          <div className="profile-tag capitalize">{animal.gender}</div>
+          <div className="profile-tag capitalize">{animal?.gender}</div>
           <div className="profile-tag capitalize">
-            {animal.breed === "SRD" ? "Raça Mista" : animal.breed}
+            {animal?.breed === "SRD" ? "Raça Mista" : animal?.breed}
           </div>
-          <div className="profile-tag capitalize">{animal.size} Porte</div>
+          <div className="profile-tag capitalize">{animal?.size} Porte</div>
           <div className="profile-tag capitalize">
-            {animal.castrated ? "Castrado" : "Não Castrado"}
+            {animal?.castrated ? "Castrado" : "Não Castrado"}
           </div>
-          <div className="profile-tag capitalize">{animal.mood}</div>
+          <div className="profile-tag capitalize">{animal?.mood}</div>
         </div>
         <div className="profile-description capitalize">
-          {animal.description}
+          {animal?.description}
         </div>
         <div className="profile-actions font-bold flex flex-col gap-4">
           <div
             className="profile-main-actions *:bg-softgreen *:rounded-md *:px-2 *:text-black *:py-2 *:tracking-widest
           flex flex-col gap-4"
           >
-            <button className="profile-contact ">
-              Conversar sobre {animal.name}
+            <button
+              className="profile-contact"
+              onClick={() => navigateToMessage(animal?.id ?? "")}
+            >
+              Conversar sobre {animal?.name}
             </button>
             <button className="profile-ignore">Ignorar e ver outros</button>
           </div>

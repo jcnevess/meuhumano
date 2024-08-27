@@ -1,14 +1,14 @@
 "use client";
 
 import styles from "./survey.module.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Sigmar_One } from "next/font/google";
 import { PetFilter } from "@/app/models/models";
-import filterDatabase from "@/app/lib/utils";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import SurveyService from "./survey.service";
 import SurveyQuestion from "../survey-question/survey-question";
+import ListService from "../list/list.service";
 
 const sigmarone = Sigmar_One({ weight: "400", subsets: ["latin"] });
 
@@ -19,12 +19,21 @@ type SurveyStep = {
 };
 
 export default function Survey() {
+  const surveyService = SurveyService.getInstance();
+
   const [currentStep, setCurrentStep] = useState(0);
+  const [availableFilters, setAvailableFilters] = useState<PetFilter[]>([]);
   const [appliedFilters, setAppliedFilters] = useState<PetFilter[]>([]);
 
   const router = useRouter();
 
-  const surveyService = SurveyService.getInstance();
+  useEffect(() => {
+    const listService = ListService.getInstance();
+
+    listService
+      .getAvailableFilters()
+      .then((filters) => setAvailableFilters(filters));
+  }, []);
 
   const steps: SurveyStep[] = [
     {
@@ -175,7 +184,7 @@ export default function Survey() {
       <SurveyQuestion
         title={steps[currentStep].title}
         relatedFilterKey={steps[currentStep].id}
-        options={filterDatabase.filter(
+        options={availableFilters.filter(
           (flt) => flt.key === steps[currentStep].id
         )}
         defaultOption={getDefaultOption(steps[currentStep].id)}

@@ -1,168 +1,56 @@
 "use client";
 
 import { PetFilter, Pet } from "@/app/models/models";
-import filterDatabase from "@/app/lib/utils";
 import { ArrowLeft, Filter, X } from "lucide-react";
-import { RefObject, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import ListService from "./list.service";
+import { useClickOutside } from "@/app/lib/hooks";
+import Link from "next/link";
 
-// Custom hook to handle clicks outside search box
-function useClickOutside(
-  ref: RefObject<HTMLElement | undefined>,
-  callback: () => void
-) {
-  const handleClick = (event: MouseEvent) => {
-    if (ref.current && !ref.current.contains(event.target as HTMLElement)) {
-      callback();
-    }
-  };
-
-  useEffect(() => {
-    document.addEventListener("click", handleClick);
-
-    return () => {
-      document.removeEventListener("click", handleClick);
-    };
-  });
+function prepareString(input: string): string {
+  return input.replaceAll("_", " ");
 }
 
 export default function List() {
-  const filters = filterDatabase;
-
-  const [filterResults, setFilterResults] = useState<PetFilter[]>([]);
-
-  const [showFilterResults, setShowFilterResults] = useState(false);
-
+  const [availableFilters, setAvailableFilters] = useState<PetFilter[]>([]);
   const [appliedFilters, setAppliedFilters] = useState<PetFilter[]>([]);
-
-  const [searchResults, setSearchResults] = useState<Pet[]>([
-    {
-      name: "Flanela",
-      shelter: "Abrigo Patinhas",
-      distance: 10,
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do \
-          eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad \
-          minim veniam, quis nostrud exercitation. Lorem ipsum dolor sit amet, \
-          consectetur adipiscing elit, sed do eiusmod tempor incididunt ut \
-          labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud \
-          exercitation.",
-      gender: "fêmea",
-      breed: "SRD",
-      size: "médio",
-      age: 5,
-      fur: "médio",
-      castrated: true,
-      mood: "agitado",
-      coverIndex: 1,
-      mediaList: [
-        {
-          mimetype: "video/mp4",
-          uri: "./files/video/dogineo.mp4",
-          alt: "Flanela",
-        },
-        {
-          mimetype: "image/jpeg",
-          uri: "./files/img/pexels-dog.jpg",
-          alt: "Flanela",
-        },
-        {
-          mimetype: "image/jpeg",
-          uri: "./files/img/pexels-dog2.jpg",
-          alt: "Flanela",
-        },
-      ],
-    },
-    {
-      name: "Flanela",
-      shelter: "Abrigo Patinhas",
-      distance: 10,
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do \
-          eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad \
-          minim veniam, quis nostrud exercitation. Lorem ipsum dolor sit amet, \
-          consectetur adipiscing elit, sed do eiusmod tempor incididunt ut \
-          labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud \
-          exercitation.",
-      gender: "fêmea",
-      breed: "SRD",
-      size: "médio",
-      age: 5,
-      fur: "médio",
-      castrated: true,
-      mood: "agitado",
-      coverIndex: 1,
-      mediaList: [
-        {
-          mimetype: "video/mp4",
-          uri: "./files/video/dogineo.mp4",
-          alt: "Flanela",
-        },
-        {
-          mimetype: "image/jpeg",
-          uri: "./files/img/pexels-dog.jpg",
-          alt: "Flanela",
-        },
-        {
-          mimetype: "image/jpeg",
-          uri: "./files/img/pexels-dog2.jpg",
-          alt: "Flanela",
-        },
-      ],
-    },
-    {
-      name: "Flanela",
-      shelter: "Abrigo Patinhas",
-      distance: 10,
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do \
-          eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad \
-          minim veniam, quis nostrud exercitation. Lorem ipsum dolor sit amet, \
-          consectetur adipiscing elit, sed do eiusmod tempor incididunt ut \
-          labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud \
-          exercitation.",
-      gender: "fêmea",
-      breed: "SRD",
-      size: "médio",
-      age: 5,
-      fur: "médio",
-      castrated: true,
-      mood: "agitado",
-      coverIndex: 1,
-      mediaList: [
-        {
-          mimetype: "video/mp4",
-          uri: "./files/video/dogineo.mp4",
-          alt: "Flanela",
-        },
-        {
-          mimetype: "image/jpeg",
-          uri: "./files/img/pexels-dog.jpg",
-          alt: "Flanela",
-        },
-        {
-          mimetype: "image/jpeg",
-          uri: "./files/img/pexels-dog2.jpg",
-          alt: "Flanela",
-        },
-      ],
-    },
-  ]);
+  const [filterResults, setFilterResults] = useState<PetFilter[]>([]);
+  const [showFilterResults, setShowFilterResults] = useState(false);
+  const [filteredProfiles, setFilteredProfiles] = useState<Pet[]>([]);
 
   const searchResultsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const listService = ListService.getInstance();
+
+    listService
+      .getFilteredProfiles(appliedFilters)
+      .then((profiles) => setFilteredProfiles(profiles));
+  }, [appliedFilters]);
+
+  useEffect(() => {
+    const listService = ListService.getInstance();
+
+    listService
+      .getAvailableFilters()
+      .then((filters) => setAvailableFilters(filters));
+  }, []);
+
+  useClickOutside(searchResultsRef, handleClickOutside);
+
+  function handleClickOutside() {
+    setShowFilterResults(false);
+  }
 
   function filterEntries(evt: React.ChangeEvent<HTMLInputElement>) {
     const query = (evt.target.value ?? "").toLocaleLowerCase();
 
     setFilterResults(
-      filters.filter(
+      availableFilters.filter(
         (fltr) => fltr.value.toLocaleLowerCase().search(query) >= 0
       )
     );
     setShowFilterResults(true);
-  }
-
-  function onClickOutside() {
-    setShowFilterResults(false);
   }
 
   function addFilter(fltr: PetFilter) {
@@ -177,8 +65,6 @@ export default function List() {
       appliedFilters.filter((applFltr) => applFltr.value !== fltr.value)
     );
   }
-
-  useClickOutside(searchResultsRef, onClickOutside);
 
   return (
     <div>
@@ -218,11 +104,11 @@ export default function List() {
           >
             {filterResults.map((fltr, index) => (
               <div
-                className="filter-result hover:bg-lightergray_"
+                className="filter-result hover:bg-lightergray_ capitalize"
                 key={index}
                 onClick={() => addFilter(fltr)}
               >
-                {fltr.value}
+                {prepareString(fltr.value)}
               </div>
             ))}
           </div>
@@ -235,7 +121,7 @@ export default function List() {
         >
           {appliedFilters.map((applFilter, index) => (
             <div key={index} className="applied-filter relative group">
-              {applFilter.value}
+              {prepareString(applFilter.value)}
               <span
                 className="close absolute scale-[65%] -top-[1px] right-[1px] 
           rounded-full bg-white bg-opacity-80 hidden group-hover:inline-block"
@@ -246,8 +132,12 @@ export default function List() {
           ))}
         </div>
         <div className="filter-results flex flex-col gap-2 flex-grow">
-          {searchResults.map((result, index) => (
-            <div className="filter-result flex items-center gap-4" key={index}>
+          {filteredProfiles.map((result, index) => (
+            <Link
+              className="filter-result flex items-center gap-4"
+              key={index}
+              href={`/profile?id=${result.id}`}
+            >
               <picture className="result-image w-[64px] h-[64px] overflow-hidden rounded-full">
                 <img
                   src={result.mediaList[result.coverIndex].uri}
@@ -260,7 +150,7 @@ export default function List() {
                 </div>
                 <div className="result-shelter">de {result.shelter}</div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

@@ -1,8 +1,23 @@
+"use client";
+
 import { ArrowLeft, Send } from "lucide-react";
 
 import styles from "./chat.module.css";
+import { useEffect, useState } from "react";
+import { Pet } from "@/app/models/models";
+import { ChatService } from "./chat.service";
 
-export default function Chat() {
+type ChatProps = { petId: string };
+
+export default function Chat(props: ChatProps) {
+  const [pet, setPet] = useState<Pet>();
+
+  useEffect(() => {
+    const chatService = ChatService.getInstance();
+
+    chatService.getPet(props.petId).then((pet) => setPet(pet));
+  });
+
   return (
     <div>
       <div
@@ -12,8 +27,8 @@ export default function Chat() {
           <ArrowLeft />
         </div>
         <div>
-          <div className="text-sm">Conversa com Abrigo Patinhas sobre</div>
-          <div className="title text-lg font-bold leading-5">Flanela</div>
+          <div className="text-sm">Conversa com {pet?.shelter} sobre</div>
+          <div className="title text-lg font-bold leading-5">{pet?.name}</div>
         </div>
       </div>
       <div
@@ -25,7 +40,7 @@ export default function Chat() {
               <img
                 src="/files/img/pexels-woman.jpg"
                 alt="User"
-                className="aspect-square w-[64px]"
+                className="aspect-square w-[64px] object-cover"
               />
             </picture>
             <div
@@ -39,9 +54,12 @@ export default function Chat() {
           <div className="chat-message message-other flex flex-row-reverse gap-4">
             <picture className="sender-avatar aspect-square overflow-hidden rounded-full flex-shrink-0 flex-grow-0 max-h-[64px]">
               <img
-                src="/files/img/pexels-dog.jpg"
-                alt="Other"
-                className="aspect-square w-[64px]"
+                src={
+                  pet?.mediaList[pet?.coverIndex].uri ??
+                  "/files/img/pexels-dog.jpg"
+                }
+                alt={pet?.name}
+                className="aspect-square w-[64px] object-cover"
               />
             </picture>
             <div
