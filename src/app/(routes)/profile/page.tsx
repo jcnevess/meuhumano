@@ -1,5 +1,5 @@
 import Profile from "@/app/components/profile/profile";
 
 export default function Page() {
-  return <Profile></Profile>;
+  return <Profile id=""></Profile>;
 }
