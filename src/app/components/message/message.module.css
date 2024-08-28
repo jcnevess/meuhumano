@@ -1,0 +1,21 @@
+.message-sent-body {
+  background-color: var(--color-primary);
+}
+
+.message-sent-body::before {
+  left: -20px;
+  background-color: var(--color-primary);
+  clip-path: polygon(0% 0%, 100% 0%, 100% 100%);
+  border-top-left-radius: 10px;
+}
+
+.message-received-body {
+  background-color: var(--color-lighter-gray);
+}
+
+.message-received-body::before {
+  right: -20px;
+  background-color: var(--color-lighter-gray);
+  clip-path: polygon(0% 0%, 0% 100%, 100% 0%);
+  border-top-right-radius: 10px;
+}

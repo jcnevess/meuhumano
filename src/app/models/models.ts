@@ -19,3 +19,14 @@ export interface PetFilter {
   key: string;
   value: string;
 }
+
+export interface MessageEmitter {
+  id: string;
+  name: string;
+  imgUri: string;
+}
+
+export enum MessageDirection {
+  SENT,
+  RECEIVED,
+}

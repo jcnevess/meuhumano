@@ -4,8 +4,9 @@ import { ArrowLeft, Send } from "lucide-react";
 
 import styles from "./chat.module.css";
 import { useEffect, useState } from "react";
-import { Pet } from "@/app/models/models";
+import { MessageDirection, MessageEmitter, Pet } from "@/app/models/models";
 import { ChatService } from "./chat.service";
+import Message from "../message/message";
 
 type ChatProps = { petId: string };
 
@@ -35,40 +36,27 @@ export default function Chat(props: ChatProps) {
         className={`${styles["chat-box"]} p-3 flex flex-col justify-between`}
       >
         <div className="chat-messages flex flex-col gap-3">
-          <div className="chat-message message-user flex gap-4">
-            <picture className="sender-avatar aspect-square overflow-hidden rounded-full flex-shrink-0 flex-grow-0 max-h-[64px]">
-              <img
-                src="/files/img/pexels-woman.jpg"
-                alt="User"
-                className="aspect-square w-[64px] object-cover"
-              />
-            </picture>
-            <div
-              className={`${styles["message-body"]} ${styles["message-main"]} rounded p-2 text-sm`}
-            >
-              Ex sunt labore pariatur enim pariatur. Veniam aliquip non proident
+          <Message
+            emitter={{
+              id: "1",
+              name: "User",
+              imgUri: "/files/img/pexels-woman.jpg",
+            }}
+            body="Ex sunt labore pariatur enim pariatur. Veniam aliquip non proident
               laboris sit in ut cupidatat deserunt excepteur ad laborum ipsum
-              consectetur.
-            </div>
-          </div>
-          <div className="chat-message message-other flex flex-row-reverse gap-4">
-            <picture className="sender-avatar aspect-square overflow-hidden rounded-full flex-shrink-0 flex-grow-0 max-h-[64px]">
-              <img
-                src={
-                  pet?.mediaList[pet?.coverIndex].uri ??
-                  "/files/img/pexels-dog.jpg"
-                }
-                alt={pet?.name}
-                className="aspect-square w-[64px] object-cover"
-              />
-            </picture>
-            <div
-              className={`${styles["message-body"]} ${styles["message-reply"]} rounded p-2 text-sm`}
-            >
-              Dolore duis ex ad nostrud laborum. Dolor ex duis ad tempor ullamco
-              eu proident amet. Adipisicing eu eu voluptate ipsum.
-            </div>
-          </div>
+              consectetur."
+            direction={MessageDirection.SENT}
+          ></Message>
+
+          <Message
+            emitter={{
+              id: pet?.id ?? "",
+              name: pet?.name ?? "",
+              imgUri: pet?.mediaList[pet.coverIndex].uri ?? "",
+            }}
+            body="Dolore duis ex ad nostrud laborum. Dolor ex duis ad tempor ullamco eu proident amet. Adipisicing eu eu voluptate ipsum."
+            direction={MessageDirection.RECEIVED}
+          ></Message>
         </div>
         <div className="chat-input flex justify-between items-center gap-2">
           <input
