@@ -11,6 +11,6 @@ react@18.3.1 tailwindcss@3.4.6 typescript@5.5.3
 
 RUN npm run build
 
-EXPOSE 8080
+EXPOSE 3000
 
 CMD ["npm", "run", "start"]
